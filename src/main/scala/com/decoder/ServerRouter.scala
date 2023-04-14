@@ -30,14 +30,14 @@ object ServerRouter {
           greeting <- H.hello(Service.Name(name))
           resp <- Ok(greeting)
         } yield resp
-      case GET -> Root / "work" / name =>
+      case GET -> Root / "fruitArrayOptic"  =>
         for {
-          greeting <- H.work(Service.Work(name))
+          greeting <- H.getFruitArrayOptic()
           resp <- Ok(greeting)
         } yield resp
-      case GET -> Root / "fruits"  =>
+      case GET -> Root / "getFruitArrayHCursor"  =>
         for {
-          greeting <- H.getFruitsDecoder()
+          greeting <- H.getFruitArrayHCursor()
           resp <- Ok(greeting)
         } yield resp
     }

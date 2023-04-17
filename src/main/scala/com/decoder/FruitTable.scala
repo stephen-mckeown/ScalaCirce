@@ -67,7 +67,7 @@ object FruitTable {
 
       val itemListOpt: Option[List[Fruit]] = for {
         vector <- items
-        item = vector.map(_.as[Fruit]).collect{case Right(value) => value}
+        item = vector.map(a => a.as[Fruit]).collect{case Right(value) => value}
       } yield (item)
 //      println(itemListOpt)
       //Some(List(Fruit(123,banana,1), Fruit(456,apple,2)))

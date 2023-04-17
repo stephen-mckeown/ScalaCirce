@@ -1,11 +1,13 @@
 package com.decoder
 
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.{Decoder, Encoder, Json, JsonObject}
 import io.circe.optics.JsonPath._
 import io.circe.parser.parse
 import cats.syntax.functor._
+import io.circe.Decoder.Result
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.syntax._
+import monocle.Optional
 
 sealed trait AuthResponse
 case class Approved(name: String, operations: String) extends AuthResponse
@@ -26,12 +28,14 @@ object GenericDerivation {
     case error @ Error(_) => error.asJson
   }
 
-  implicit val decodeAuth: Decoder[AuthResponse] =
+  implicit val decodeAuth: Decoder[AuthResponse] = {
     List[Decoder[AuthResponse]](
       Decoder[Approved].widen,
       Decoder[Forbidden].widen,
       Decoder[Error].widen,
     ).reduceLeft(_ or _)
+    //Decoder is not covairiant hence the use of widen
+  }
 }
 
 trait AuthTable {
@@ -44,7 +48,7 @@ object AuthTable {
   def apply(): AuthTable = new AuthTable {
     val authJson: Json = parse(
       """
-        {"data":
+        {"data":{
           "approved": {
             "name": "Paul McGrath",
             "operations": "mutate"
@@ -56,20 +60,24 @@ object AuthTable {
            "error": {
             "errors": "server error"
           }
+          }
         }
         """).getOrElse(Json.Null)
 
      def getAuth(request: String): Option[AuthResponse] = {
-       val asd = root.data.request
-      val items: Option[Json] = asd.getOption(authJson)
-      val itemListOpt: Option[AuthResponse] = items.map(a => a.as[AuthResponse]).flatMap(_.toOption)
-       itemListOpt
+       //use variables in optics with 'selectDynamic'
+     val jsonObj: Optional[Json, JsonObject] = root.data.selectDynamic(request).obj
+     val authResult: Option[Result[AuthResponse]] = jsonObj.getOption(authJson).map(_.asJson).map(a => a.as[AuthResponse])
+     val authResponse = authResult.collect{case Right(value) => value}
+//       println(("authResponse", authResponse))
+
+       authResponse
     }
   }
 }
 
 /**
-  * ADTs encoding and decoding
+  * algebraic data types encoding and decoding
 
 # The Product Type Pattern
 Our first pattern is to model data that contains other data.

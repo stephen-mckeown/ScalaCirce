@@ -47,9 +47,9 @@ object ServerRouter {
           carList <- H.getCar()
           resp <- Ok(carList)
         } yield resp
-      case GET -> Root / "getAuth"  =>
+      case GET -> Root / "getAuth" / query  =>
         for {
-          auth <- H.getAuth("approved")
+          auth <- H.getAuth(query)
           resp <- Ok(auth)
         } yield resp
     }

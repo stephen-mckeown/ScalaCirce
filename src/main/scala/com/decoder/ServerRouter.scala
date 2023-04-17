@@ -8,6 +8,8 @@ import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 
 
 object ServerRouter {
+  import GenericDerivation._
+
 
   def jokeRoutes[F[_]: Sync](J: Jokes[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
@@ -32,13 +34,23 @@ object ServerRouter {
         } yield resp
       case GET -> Root / "fruitArrayOptic"  =>
         for {
-          greeting <- H.getFruitArrayOptic()
-          resp <- Ok(greeting)
+          fruitList <- H.getFruitArrayOptic()
+          resp <- Ok(fruitList)
         } yield resp
       case GET -> Root / "getFruitArrayHCursor"  =>
         for {
-          greeting <- H.getFruitArrayHCursor()
-          resp <- Ok(greeting)
+          fruit <- H.getFruitArrayHCursor()
+          resp <- Ok(fruit)
+        } yield resp
+      case GET -> Root / "getCar"  =>
+        for {
+          carList <- H.getCar()
+          resp <- Ok(carList)
+        } yield resp
+      case GET -> Root / "getAuth"  =>
+        for {
+          auth <- H.getAuth("approved")
+          resp <- Ok(auth)
         } yield resp
     }
   }

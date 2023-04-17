@@ -9,6 +9,7 @@ import io.circe.parser.parse
 case class Fruit(id: Int, description: String, quantity: Int)
 
 object Fruit {
+  //Semi-automatic Derivation
   implicit val fooDecoder: Decoder[Fruit] = deriveDecoder[Fruit]
   implicit val fooEncoder: Encoder[Fruit] = deriveEncoder[Fruit]
 }

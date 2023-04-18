@@ -42,12 +42,12 @@ object ServerRouter {
           fruit <- H.getFruitArrayHCursor()
           resp <- Ok(fruit)
         } yield resp
-      case GET -> Root / "getCar"  =>
+      case GET -> Root / "getCarProductNDecoder"  =>
         for {
           carList <- H.getCar()
           resp <- Ok(carList)
         } yield resp
-      case GET -> Root / "getAuth" / query  =>
+      case GET -> Root / "getAuthADT" / query  =>
         for {
           auth <- H.getAuth(query)
           resp <- Ok(auth)

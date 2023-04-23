@@ -15,8 +15,8 @@ case class Forbidden(reason: String, reasonCode: Int) extends AuthResponse
 case class Error(errors: String) extends AuthResponse
 
 object GenericDerivation {
-  implicit val appEncoder: Encoder[Approved]  = deriveEncoder[Approved]
-  implicit val appDecoder: Decoder[Approved]  = deriveDecoder[Approved]
+  implicit val approveEncoder: Encoder[Approved]  = deriveEncoder[Approved]
+  implicit val approveDecoder: Decoder[Approved]  = deriveDecoder[Approved]
   implicit val forbiddenEncoder: Encoder[Forbidden]  = deriveEncoder[Forbidden]
   implicit val forbiddenDecoder: Decoder[Forbidden]  = deriveDecoder[Forbidden]
   implicit val errEncoder: Encoder[Error]  = deriveEncoder[Error]

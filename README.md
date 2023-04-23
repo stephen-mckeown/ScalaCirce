@@ -95,3 +95,44 @@ create custom decoders using productN with up to 22 fields
 implicit val decodeCar: Decoder[Car] =
     Decoder.forProduct3("name", "engine", "wheels")(Car.apply)
  ```
+
+
+## Algebraic data types encoding and decoding
+
+# The Product Type Pattern
+Our first pattern is to model data that contains other data.
+We might describe this as “A has a B and C”.
+
+For example,
+a Cat has a colour and a favourite food;
+a Visitor has an id and a creation date; and so on.
+
+The way we write this is to use a case class.
+We’ve already done this many
+times in exercises; now we’re formalising the pattern.
+
+If A has a b (with type B) and a c (with type C) write
+```
+case class A(b: B, c: C)
+ // or
+trait A {
+def b: B
+def c: C
+}
+```
+
+# The Sum Type Pattern
+Our next pattern is to model data that is two or more distinct cases.
+We might describe this as  “A is a B or C”.
+For example,
+a Feline is a Cat, Lion, or Tiger;
+a Visitor is an Anonymous or User; and so on.
+
+We write this using the sealed trait / final case class pattern.
+Sum Type Pattern
+If A is a B or C write
+```
+sealed trait A
+final case class B() extends A
+final case class C() extends A
+```

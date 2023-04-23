@@ -100,16 +100,11 @@ implicit val decodeCar: Decoder[Car] =
 ## Algebraic data types encoding and decoding
 
 # The Product Type Pattern
-Our first pattern is to model data that contains other data.
-We might describe this as “A has a B and C”.
+Model of “A has a B and C”.
 
 For example,
 a Cat has a colour and a favourite food;
 a Visitor has an id and a creation date; and so on.
-
-The way we write this is to use a case class.
-We’ve already done this many
-times in exercises; now we’re formalising the pattern.
 
 If A has a b (with type B) and a c (with type C) write
 ```
@@ -122,17 +117,41 @@ def c: C
 ```
 
 # The Sum Type Pattern
-Our next pattern is to model data that is two or more distinct cases.
-We might describe this as  “A is a B or C”.
+Model data that is two or more distinct cases.
+ “A is a B or C”.
+
 For example,
 a Feline is a Cat, Lion, or Tiger;
 a Visitor is an Anonymous or User; and so on.
 
-We write this using the sealed trait / final case class pattern.
+Write this using the sealed trait / final case class pattern.
 Sum Type Pattern
 If A is a B or C write
 ```
 sealed trait A
 final case class B() extends A
 final case class C() extends A
+
+
+object GenericDerivation {
+  implicit val bEncoder: Encoder[B]  = deriveEncoder[B]
+  implicit val bDecoder: Decoder[A]  = deriveDecoder[A]
+  implicit val cEncoder: Encoder[C]  = deriveEncoder[C]
+  implicit val cDecoder: Decoder[C]  = deriveDecoder[C]
+
+
+  implicit val encodeA: Encoder[A] = Encoder.instance {
+    case b @ B(_) => b.asJson
+    case c @ C(_) => c.asJson
+  }
+
+  implicit val decodeA: Decoder[A] = {
+    List[Decoder[A]](
+      Decoder[B].widen,
+      Decoder[C].widen,
+    ).reduceLeft(_ or _)
+    //Decoder is not covairiant hence the use of widen
+  }
+}
+
 ```

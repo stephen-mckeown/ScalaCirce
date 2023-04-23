@@ -13,15 +13,15 @@ object WebSever {
   def run[F[_]: Async]: F[Nothing] = {
     for {
       client <- EmberClientBuilder.default[F].build
-      helloWorldAlg = Service.impl[F]
-      jokeAlg = Jokes.impl[F](client)
+      serviceRoutes = Service.impl[F]
+      jokeAlg = JokeClient.impl[F](client)
 
       // Combine Service Routes into an HttpApp.
       // Can also be done via a Router if you
       // want to extract segments not checked
       // in the underlying routes.
       httpApp = (
-        ServerRouter.routes[F](helloWorldAlg) <+>
+        ServerRouter.routes[F](serviceRoutes) <+>
         ServerRouter.jokeRoutes[F](jokeAlg)
       ).orNotFound
 

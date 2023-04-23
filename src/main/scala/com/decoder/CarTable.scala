@@ -19,7 +19,7 @@ object Car {
 }
 
 trait CarTable {
-  def getCar(): Option[List[Car]]
+  def getCarProductNDecoder(): Option[List[Car]]
 }
 
 object CarTable {
@@ -48,7 +48,7 @@ object CarTable {
         }
         """).getOrElse(Json.Null)
 
-     def getCar(): Option[List[Car]] = {
+     def getCarProductNDecoder(): Option[List[Car]] = {
       val items: Option[List[Json]] = root.order.items.arr.getOption(carJson).map(_.toList)
 
       val itemListOpt: Option[List[Car]] = for {

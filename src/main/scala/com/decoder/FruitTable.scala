@@ -1,10 +1,11 @@
 package com.decoder
 
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.{ Decoder, Encoder, HCursor, Json}
 import io.circe.literal._
 import io.circe.optics.JsonPath._
 import io.circe.parser.parse
+
 
 case class Fruit(id: Int, description: String, quantity: Int)
 
@@ -16,7 +17,9 @@ object Fruit {
 
 trait FruitTable {
   def getFruitArrayOptic(): Option[List[Fruit]]
+  def getFruitItemOptic(): Option[String]
   def getFruitArrayHCursor(): Option[Fruit]
+  def getFruitItemHCursor(): Option[Double]
 }
 
 object FruitTable {
@@ -53,6 +56,7 @@ object FruitTable {
         *
         * With optics we first define the traversal we want to make, then apply it to a JSON document
         */
+
       val items: Option[List[Json]] = root.order.items.arr.getOption(fruitJson).map(_.toList)
 //      println(items)
       //Some(List({
@@ -67,23 +71,32 @@ object FruitTable {
 
       val itemListOpt: Option[List[Fruit]] = for {
         vector <- items
-        item = vector.map(a => a.as[Fruit]).collect{case Right(value) => value}
+        item = vector.map(json => json.as[Fruit]).collect{case Right(value) => value}
       } yield (item)
 //      println(itemListOpt)
       //Some(List(Fruit(123,banana,1), Fruit(456,apple,2)))
       itemListOpt
     }
 
+    def getFruitItemOptic(): Option[String] = {
+      val phoneNumber: Option[String] = root.order.customer.contactDetails.phone.string.getOption(fruitJson)
+//      println(("phoneNumber", phoneNumber))
+      phoneNumber
+    }
+
     override def getFruitArrayHCursor(): Option[Fruit] = {
       /**
         * With cursors, we start with a JSON document, get a cursor from it, and then use that cursor to traverse the document.
         * https://circe.github.io/circe/api/io/circe/ACursor.html
+        *
+        * Cursor provides functionality for moving around a tree and making modifications
+        * HCursor tracks the history of operations performed. This can be used to provide useful error messages when something goes wrong.
+        * ACursor also tracks history, but represents the possibility of failure (e.g. calling downField on a field that doesn’t exist)
         */
       val cursor: HCursor = fruitJson.hcursor
 
       val firstIndexArray: Option[Fruit] =
         cursor.downField("order").downField("items").downN(1).as[Fruit].toOption
-//    println(cursor.downField("order").downField("items").downN(1).focus)
 //    println(firstIndexArray)
       //Some({
       //  "id" : 456,
@@ -91,6 +104,23 @@ object FruitTable {
       //  "quantity" : 2
       //})
       firstIndexArray
+    }
+
+    override def getFruitItemHCursor(): Option[Double] = {
+
+      val cursor: HCursor = fruitJson.hcursor
+
+      val optJson: Option[Json] =
+        cursor.downField("order").downField("total").focus
+      println(("optJson", optJson))
+      //(optJson,Some(123.45))
+
+      val optDouble =
+        cursor.downField("order").downField("total").as[Double].toOption
+      println(("optDouble", optDouble))
+      //(optJson,Some(123.45))
+
+      optDouble
     }
   }
 }

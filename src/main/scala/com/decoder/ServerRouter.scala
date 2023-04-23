@@ -11,11 +11,11 @@ object ServerRouter {
   import GenericDerivation._
 
 
-  def jokeRoutes[F[_]: Sync](J: Jokes[F]): HttpRoutes[F] = {
+  def jokeRoutes[F[_]: Sync](J: JokeClient[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
     HttpRoutes.of[F] {
-      case GET -> Root / "joke" =>
+      case GET -> Root / "getJoke" =>
         for {
           joke <- J.get
           resp <- Ok(joke)
@@ -32,9 +32,14 @@ object ServerRouter {
           greeting <- H.hello(Service.Name(name))
           resp <- Ok(greeting)
         } yield resp
-      case GET -> Root / "fruitArrayOptic"  =>
+      case GET -> Root / "opticGetArray"  =>
         for {
           fruitList <- H.getFruitArrayOptic()
+          resp <- Ok(fruitList)
+        } yield resp
+      case GET -> Root / "opticGetItem"  =>
+        for {
+          fruitList <- H.getFruitItemOptic()
           resp <- Ok(fruitList)
         } yield resp
       case GET -> Root / "getFruitArrayHCursor"  =>
@@ -42,9 +47,14 @@ object ServerRouter {
           fruit <- H.getFruitArrayHCursor()
           resp <- Ok(fruit)
         } yield resp
+      case GET -> Root / "getFruitItemHCursor"  =>
+        for {
+          fruit <- H.getFruitItemHCursor()
+          resp <- Ok(fruit)
+        } yield resp
       case GET -> Root / "getCarProductNDecoder"  =>
         for {
-          carList <- H.getCar()
+          carList <- H.getCarProductNDecoder()
           resp <- Ok(carList)
         } yield resp
       case GET -> Root / "getAuthADT" / query  =>

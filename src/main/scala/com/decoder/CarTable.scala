@@ -13,7 +13,7 @@ object Car {
     Decoder.forProduct3("name", "engine", "wheels")(Car.apply)
 
   implicit val encodeCar: Encoder[Car] =
-    Encoder.forProduct3("id", "first_name", "last_name")(c =>
+    Encoder.forProduct3("name", "engine", "wheels")(c =>
       (c.name, c.engine, c.wheels)
     )
 }

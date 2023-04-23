@@ -88,3 +88,10 @@ https://circe.github.io/circe/api/io/circe/ACursor.html
     cursor.downField("order").downField("total").as[Double].toOption
     //Some(123.45)
 ```
+
+# forProductN decoder
+create custom decoders using productN with up to 22 fields
+```  
+implicit val decodeCar: Decoder[Car] =
+    Decoder.forProduct3("name", "engine", "wheels")(Car.apply)
+ ```
